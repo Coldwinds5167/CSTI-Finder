@@ -6,6 +6,7 @@ using BepInEx.Logging;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.Serialization;
+using BepInEx.Configuration;
 
 namespace Finder;
 
@@ -14,7 +15,7 @@ internal class Plugin : BaseUnityPlugin
 {
     private const string PluginGuid = "top.coldwinds.finder";
     public const string PluginName = "Finder";
-    public const string PluginVersion = "1.0.0";
+    public const string PluginVersion = "1.1";
 
     public static Plugin Instance = null!;
     public static ManualLogSource Log = null!;
@@ -31,10 +32,16 @@ internal class Plugin : BaseUnityPlugin
     private string _searchedCardString;
     private Vector2 _cardsListScrollView;
     private string _pathUrl;
+    private ConfigEntry<KeyCode> _hotkey;
     [FormerlySerializedAs("ManualSaveUIPanel0bj1")] public GameObject manualSaveUIPanel0Bj1;
     [FormerlySerializedAs("ManualSaveUIPanel1")] public RectTransform manualSaveUIPanel1;
     [FormerlySerializedAs("myLoadABPrefab")] public AssetBundle myLoadAbPrefab;
-    
+
+    private void Start()
+    {
+	    _hotkey = Config.Bind<KeyCode>("config", "hotkey", KeyCode.F7, "快捷键");
+    }
+
     private void Awake()
     {
         Instance = this;
@@ -59,7 +66,7 @@ internal class Plugin : BaseUnityPlugin
             _gm = MBSingleton<GameManager>.Instance;
         }
 
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(_hotkey.Value))
         {
             UpdateCard();
             _showGUI = !_showGUI;
